@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: businesses
+    // Document ID: auto-generated
+    // Fields:
+    //   - name: string (required, 1-100 chars)
+    //   - rating: number (optional, 0-5)
+    //   - reviews: number (optional, 0+)
+    //   - phoneNumber: string (optional, 0-20 chars)
+    //   - address: string (optional, 0-200 chars)
+    //   - status: string (required, enum: Not Contacted, Contacted, Interested, Closed)
+    //   - notes: string (optional, 0-1000 chars)
+    //   - dateAdded: timestamp (required)
+    //   - ownerUid: string (required, matches auth.uid)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.ownerUid;
+    }
+
+    function uidUnchanged() {
+      return !('ownerUid' in request.resource.data) ||
+        request.resource.data.ownerUid == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('ownerUid' in request.resource.data) ||
+        request.resource.data.ownerUid == resource.data.ownerUid;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isValidStatus(status) {
+      return status in ['Not Contacted', 'Contacted', 'Interested', 'Closed'];
+    }
+
+    function isValidBusiness(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 100 &&
+             data.status is string && isValidStatus(data.status) &&
+             data.dateAdded is timestamp &&
+             data.ownerUid is string && data.ownerUid == request.auth.uid &&
+             (!('rating' in data) || (data.rating is number && data.rating >= 0 && data.rating <= 5)) &&
+             (!('reviews' in data) || (data.reviews is number && data.reviews >= 0)) &&
+             (!('phoneNumber' in data) || (data.phoneNumber is string && data.phoneNumber.size() <= 20)) &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 200)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000)) &&
+             (!('aiScore' in data) || (data.aiScore is number)) &&
+             (!('aiSummary' in data) || (data.aiSummary is string)) &&
+             (!('aiOutreach' in data) || (data.aiOutreach is string)) &&
+             (!('nextContactDate' in data) || (data.nextContactDate is timestamp)) &&
+             (!('activities' in data) || (data.activities is list));
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /businesses/{businessId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidBusiness(request.resource.data);
+      allow update: if isDocOwner() && isValidBusiness(request.resource.data) && uidNotModified();
+      allow delete: if isDocOwner();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

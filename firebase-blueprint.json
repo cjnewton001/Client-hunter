@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "business": {
+      "title": "Business",
+      "description": "A potential business client for lead tracking.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the business."
+        },
+        "rating": {
+          "type": "number",
+          "description": "The rating of the business (stars)."
+        },
+        "reviews": {
+          "type": "number",
+          "description": "The number of reviews the business has."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number of the business."
+        },
+        "address": {
+          "type": "string",
+          "description": "The physical address of the business."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Not Contacted", "Contacted", "Interested", "Closed"],
+          "description": "The current status of the lead."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about the business."
+        },
+        "dateAdded": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date the business was added to the system."
+        },
+        "ownerUid": {
+          "type": "string",
+          "description": "The UID of the user who added this business."
+        }
+      },
+      "required": ["name", "status", "dateAdded", "ownerUid"]
+    }
+  },
+  "firestore": {
+    "/businesses/{businessId}": {
+      "schema": "business",
+      "description": "Collection of potential business clients."
+    }
+  }
+}

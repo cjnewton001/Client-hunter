@@ -1,0 +1,5 @@
+{
+  "name": "Client Hunter",
+  "description": "A CRM tool for tracking and managing potential business clients with status tracking and notes.",
+  "requestFramePermissions": []
+}
