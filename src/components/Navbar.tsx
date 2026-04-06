@@ -8,15 +8,20 @@ interface NavbarProps {
   user: User | null;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  currentView: 'dashboard' | 'leads' | 'settings';
+  setView: (view: 'dashboard' | 'leads' | 'settings') => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ user, theme, toggleTheme }) => {
+export const Navbar: React.FC<NavbarProps> = ({ user, theme, toggleTheme, currentView, setView }) => {
   return (
     <nav className="sticky top-0 z-50 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <div className="flex items-center gap-2 group cursor-pointer">
+          <div 
+            className="flex items-center gap-2 group cursor-pointer"
+            onClick={() => setView('dashboard')}
+          >
             <div className="p-2 bg-indigo-600 rounded-xl group-hover:rotate-12 transition-transform duration-300 shadow-lg shadow-indigo-200 dark:shadow-none">
               <Briefcase className="text-white" size={20} />
             </div>
@@ -28,18 +33,27 @@ export const Navbar: React.FC<NavbarProps> = ({ user, theme, toggleTheme }) => {
           {/* Navigation Links (Desktop) */}
           {user && (
             <div className="hidden md:flex items-center gap-8">
-              <a href="#" className="text-sm font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+              <button 
+                onClick={() => setView('dashboard')}
+                className={`text-sm font-bold flex items-center gap-2 transition-colors ${currentView === 'dashboard' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
+              >
                 <LayoutDashboard size={16} />
                 Dashboard
-              </a>
-              <a href="#" className="text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2">
+              </button>
+              <button 
+                onClick={() => setView('leads')}
+                className={`text-sm font-bold flex items-center gap-2 transition-colors ${currentView === 'leads' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
+              >
                 <UserIcon size={16} />
                 Leads
-              </a>
-              <a href="#" className="text-sm font-bold text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-2">
+              </button>
+              <button 
+                onClick={() => setView('settings')}
+                className={`text-sm font-bold flex items-center gap-2 transition-colors ${currentView === 'settings' ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400'}`}
+              >
                 <Settings size={16} />
                 Settings
-              </a>
+              </button>
             </div>
           )}
 

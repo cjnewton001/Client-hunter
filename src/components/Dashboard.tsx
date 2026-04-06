@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { db, collection, onSnapshot, query, where, orderBy, addDoc, updateDoc, deleteDoc, doc, handleFirestoreError, OperationType } from '../firebase';
-import { Business, BusinessStatus } from '../types';
+import { Business, BusinessStatus, UserSettings } from '../types';
 import { User } from 'firebase/auth';
 import { BusinessCard } from './BusinessCard';
 import { BusinessForm } from './BusinessForm';
@@ -12,9 +12,10 @@ interface DashboardProps {
   user: User;
   showAddModal: boolean;
   setShowAddModal: (show: boolean) => void;
+  settings: UserSettings;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ user, showAddModal, setShowAddModal }) => {
+export const Dashboard: React.FC<DashboardProps> = ({ user, showAddModal, setShowAddModal, settings }) => {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,15 +65,22 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, showAddModal, setSho
       'Closed': 0,
     };
     businesses.forEach(b => {
-      if (stats[b.status] !== undefined) stats[b.status]++;
+      if (stats[b.status as keyof typeof stats] !== undefined) stats[b.status as keyof typeof stats]++;
     });
     return stats;
   }, [businesses]);
 
   const overdueFollowups = useMemo(() => {
     const now = new Date();
-    return businesses.filter(b => b.nextContactDate && b.nextContactDate.toDate() <= now && b.status !== 'Closed');
-  }, [businesses]);
+    const thresholdDate = new Date();
+    thresholdDate.setDate(now.getDate() + (settings?.followUpThreshold || 3));
+    
+    return businesses.filter(b => 
+      b.nextContactDate && 
+      b.nextContactDate.toDate() <= thresholdDate && 
+      b.status !== 'Closed'
+    );
+  }, [businesses, settings.followUpThreshold]);
 
   const exportToCSV = () => {
     const headers = ['Name', 'Status', 'Rating', 'Reviews', 'Phone', 'Address', 'Date Added', 'Notes'];
@@ -148,6 +156,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ user, showAddModal, setSho
           </button>
           <button 
             onClick={exportToCSV}
+            data-export-btn
             className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 text-gray-600 dark:text-slate-300 border border-gray-100 dark:border-slate-800 rounded-xl font-bold text-sm hover:bg-gray-50 dark:hover:bg-slate-800 transition-all"
           >
             <Download size={18} />

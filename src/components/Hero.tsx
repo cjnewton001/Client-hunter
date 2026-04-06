@@ -90,16 +90,27 @@ export const Hero: React.FC = () => {
             <div className="relative aspect-square max-w-md mx-auto">
               {/* Main Card */}
               <motion.div
-                animate={{ y: [0, -20, 0] }}
+                animate={{ 
+                  y: [0, -20, 0],
+                  rotate: [0, 1, 0]
+                }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute inset-0 bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-[3rem] shadow-2xl p-8 z-20"
               >
                 <div className="flex items-center gap-4 mb-8">
-                  <div className="w-14 h-14 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center">
+                  <motion.div 
+                    animate={{ rotate: [0, 10, -10, 0] }}
+                    transition={{ duration: 3, repeat: Infinity }}
+                    className="w-14 h-14 bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-200 dark:shadow-none flex items-center justify-center"
+                  >
                     <Users className="text-white" size={28} />
-                  </div>
+                  </motion.div>
                   <div className="flex-1 space-y-2">
-                    <div className="h-4 bg-gray-100 dark:bg-slate-800 rounded-full w-3/4"></div>
+                    <motion.div 
+                      animate={{ width: ['60%', '80%', '60%'] }}
+                      transition={{ duration: 4, repeat: Infinity }}
+                      className="h-4 bg-gray-100 dark:bg-slate-800 rounded-full"
+                    ></motion.div>
                     <div className="h-3 bg-gray-50 dark:bg-slate-800/50 rounded-full w-1/2"></div>
                   </div>
                 </div>
@@ -111,7 +122,8 @@ export const Hero: React.FC = () => {
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.5 + i * 0.2 }}
-                      className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800"
+                      whileHover={{ scale: 1.02, x: 5 }}
+                      className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-slate-800/50 rounded-2xl border border-gray-100 dark:border-slate-800 cursor-pointer"
                     >
                       <div className={`w-10 h-10 rounded-xl ${i === 1 ? 'bg-green-100 text-green-600' : i === 2 ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'} flex items-center justify-center`}>
                         {i === 1 ? <TrendingUp size={20} /> : i === 2 ? <Target size={20} /> : <Zap size={20} />}
@@ -135,7 +147,12 @@ export const Hero: React.FC = () => {
                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-600 rounded-3xl shadow-xl z-30 flex items-center justify-center text-white"
               >
-                <TrendingUp size={48} />
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <TrendingUp size={48} />
+                </motion.div>
               </motion.div>
 
               <motion.div
@@ -147,7 +164,35 @@ export const Hero: React.FC = () => {
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -bottom-10 -left-10 w-28 h-28 bg-purple-600 rounded-3xl shadow-xl z-10 flex items-center justify-center text-white"
               >
-                <Target size={40} />
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                >
+                  <Target size={40} />
+                </motion.div>
+              </motion.div>
+
+              {/* Extra Floating Icons */}
+              <motion.div
+                animate={{ 
+                  y: [0, -15, 0],
+                  opacity: [0.5, 1, 0.5]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute top-1/4 -left-20 p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 z-10"
+              >
+                <Zap className="text-yellow-500" size={24} />
+              </motion.div>
+
+              <motion.div
+                animate={{ 
+                  y: [0, 15, 0],
+                  opacity: [0.5, 1, 0.5]
+                }}
+                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                className="absolute bottom-1/4 -right-20 p-4 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 z-10"
+              >
+                <ShieldCheck className="text-green-500" size={24} />
               </motion.div>
 
               {/* Decorative Rings */}
